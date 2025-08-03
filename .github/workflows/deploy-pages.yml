@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build application
+      run: npm run build
+      env:
+        DATABASE_URL: postgresql://temp:temp@localhost:5432/temp
+        NODE_ENV: production
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist/public
+        
+    - name: Create deployment summary
+      run: |
+        echo "## 🚀 GitHub Pages Deployment!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📱 Din app er nu tilgængelig på:" >> $GITHUB_STEP_SUMMARY
+        echo "**https://philiphov.github.io/tids-stempel-app/**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Bemærk:** Backend API funktioner kræver Netlify Functions." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Næste trin:**" >> $GITHUB_STEP_SUMMARY
+        echo "1. Gå til repository Settings" >> $GITHUB_STEP_SUMMARY
+        echo "2. Scroll ned til 'Pages'" >> $GITHUB_STEP_SUMMARY
+        echo "3. Vælg 'gh-pages' branch som source" >> $GITHUB_STEP_SUMMARY 
