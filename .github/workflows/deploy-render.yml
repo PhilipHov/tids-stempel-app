@@ -1,0 +1,53 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build application
+      run: npm run build
+      env:
+        DATABASE_URL: postgresql://temp:temp@localhost:5432/temp
+        NODE_ENV: production
+        
+    - name: Create deployment summary
+      run: |
+        echo "## 🚀 Build Complete!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📱 Tids Stempel App er klar til deployment!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Næste trin:**" >> $GITHUB_STEP_SUMMARY
+        echo "1. Gå til [render.com](https://render.com)" >> $GITHUB_STEP_SUMMARY
+        echo "2. Log ind med GitHub" >> $GITHUB_STEP_SUMMARY
+        echo "3. Klik 'New Web Service'" >> $GITHUB_STEP_SUMMARY
+        echo "4. Vælg dit repository: PhilipHov/tids-stempel-app" >> $GITHUB_STEP_SUMMARY
+        echo "5. Build Command: npm run build" >> $GITHUB_STEP_SUMMARY
+        echo "6. Start Command: npm run start" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment Variables:**" >> $GITHUB_STEP_SUMMARY
+        echo "- DATABASE_URL=postgresql://temp:temp@localhost:5432/temp" >> $GITHUB_STEP_SUMMARY
+        echo "- NODE_ENV=production" >> $GITHUB_STEP_SUMMARY
+        echo "- PORT=5000" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Features:**" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Clock in/out funktionalitet" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Arbejdstid tracking" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Mobile-responsive design" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Dansk interface" >> $GITHUB_STEP_SUMMARY 
