@@ -72,5 +72,7 @@ app.use((req, res, next) => {
   // It is the only port that is not firewalled.
   server.listen(config.server.port, config.server.host, () => {
     log(`serving on port ${config.server.port}`);
+    log(`Environment: ${config.server.nodeEnv}`);
+    log(`Host: ${config.server.host}`);
   });
 })();
