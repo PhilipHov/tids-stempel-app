@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for Leaflet default markers
 import L from 'leaflet';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
 });
 import { barracks, personnel, resourceRequirements } from '../../../shared/schema';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -62,15 +66,8 @@ interface MilitaryResourceMapProps {
 
 export function MilitaryResourceMap({ barracks, onBarracksSelect }: MilitaryResourceMapProps) {
   const [selectedBarracks, setSelectedBarracks] = useState<BarracksWithResources | null>(null);
-  const [mapReady, setMapReady] = useState(false);
   
   console.log('MilitaryResourceMap rendered with barracks:', barracks.length);
-  
-  useEffect(() => {
-    // Ensure map is ready
-    const timer = setTimeout(() => setMapReady(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleMarkerClick = (barracks: BarracksWithResources) => {
     console.log('Marker clicked:', barracks.name);
@@ -118,10 +115,6 @@ export function MilitaryResourceMap({ barracks, onBarracksSelect }: MilitaryReso
       default: return <MapPin className="h-4 w-4" />;
     }
   };
-
-  if (!mapReady) {
-    return <div className="w-full h-full flex items-center justify-center">Loading map...</div>;
-  }
 
   return (
     <div className="w-full h-full relative">
