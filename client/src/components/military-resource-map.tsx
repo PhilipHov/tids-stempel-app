@@ -24,8 +24,25 @@ const createBarracksIcon = (color: string) => new Icon({
 // Default barracks icon
 const barracksIcon = createBarracksIcon('#3b82f6');
 
-interface BarracksWithResources extends typeof barracks.$inferSelect {
-  resources?: typeof resourceRequirements.$inferSelect;
+interface BarracksWithResources {
+  id: string;
+  name: string;
+  location: string;
+  regiment: string;
+  region: string;
+  latitude: number;
+  longitude: number;
+  resources?: {
+    id: string;
+    barracksId: string;
+    requiredSSG: number;
+    requiredBefalingsmaend: number;
+    requiredOfficerer: number;
+    currentSSG: number;
+    currentBefalingsmaend: number;
+    currentOfficerer: number;
+    lastUpdated: Date;
+  };
   personnelCount?: number;
 }
 
@@ -47,7 +64,7 @@ export function MilitaryResourceMap({ barracks, onBarracksSelect }: MilitaryReso
     return '#3b82f6'; // Blue for all regiments
   };
 
-  const getResourceStatus = (resources?: typeof resourceRequirements.$inferSelect) => {
+  const getResourceStatus = (resources?: BarracksWithResources['resources']) => {
     if (!resources) return 'unknown';
     
     const hasShortage = 
