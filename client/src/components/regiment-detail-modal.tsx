@@ -24,7 +24,9 @@ import {
   UserMinus,
   Shield,
   Star,
-  Building2
+  Building2,
+  GraduationCap,
+  Truck
 } from 'lucide-react';
 
 interface RegimentData {
