@@ -31,14 +31,14 @@ export function MilitaryResourceMap({ barracks, onBarracksSelect }: MilitaryReso
     <MapContainer
       center={[56, 10]}
       zoom={7}
-      style={{ height: "100vh", width: "100%", backgroundColor: "#f0f0f0" }}
+      style={{ height: "100vh", width: "100%", backgroundColor: "#f8f9fa" }}
       maxBounds={[[53.0, 7.0], [58.0, 16.0]]}
       maxBoundsViscosity={1.0}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        opacity={0.7}
+        opacity={0.3}
       />
       
       {barracks.map((barrack) => (
