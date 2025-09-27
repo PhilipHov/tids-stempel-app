@@ -18,6 +18,7 @@
   ],
   "env": {
     "NODE_ENV": "production",
+    "DATABASE_URL": "postgresql://temp:temp@localhost:5432/temp",
     "PORT": "5000"
   }
 } 
