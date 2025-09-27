@@ -5,9 +5,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { MilitaryResourceMap } from './components/military-resource-map';
 import { MilitarySidebar } from './components/military-sidebar';
 import { BarracksDetailModal } from './components/barracks-detail-modal';
+import { RegimentDetailModal } from './components/regiment-detail-modal';
 import { ResourceAllocation } from './components/resource-allocation';
 import { DeploymentPlanning } from './components/deployment-planning';
 import { allBarracks } from './data/barracks-data';
+import { allPersonnel } from './data/personnel-data';
 import { queryClient } from "./lib/queryClient";
 
 // Use real barracks data

@@ -43,16 +43,8 @@ export function MilitaryResourceMap({ barracks, onBarracksSelect }: MilitaryReso
   };
 
   const getRegimentColor = (regiment: string) => {
-    switch (regiment) {
-      case 'Hæren': return '#22c55e'; // Green
-      case 'Marinen': return '#3b82f6'; // Blue
-      case 'Flyvevåbnet': return '#8b5cf6'; // Purple
-      case 'Livgarden': return '#f59e0b'; // Orange
-      case 'Gardehusarregimentet': return '#ef4444'; // Red
-      case 'Jydske Dragonregiment': return '#06b6d4'; // Cyan
-      case 'Ingeniørregimentet': return '#84cc16'; // Lime
-      default: return '#3b82f6'; // Default blue
-    }
+    // All regiments use blue pins
+    return '#3b82f6'; // Blue for all regiments
   };
 
   const getResourceStatus = (resources?: typeof resourceRequirements.$inferSelect) => {
