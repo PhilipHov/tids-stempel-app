@@ -77,7 +77,6 @@ const mockAvailableResources = [
 ];
 
 interface FilterOptions {
-  activityType: string;
   unitType: string;
   location: string;
 }
@@ -86,7 +85,6 @@ function App() {
   const [selectedBarracks, setSelectedBarracks] = useState<typeof mockBarracks[0] | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [filters, setFilters] = useState<FilterOptions>({
-    activityType: '',
     unitType: '',
     location: '',
   });

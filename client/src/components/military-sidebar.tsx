@@ -26,7 +26,6 @@ interface MilitarySidebarProps {
 }
 
 interface FilterOptions {
-  activityType: string;
   unitType: string;
   location: string;
 }
@@ -52,18 +51,11 @@ export function MilitarySidebar({
   };
 
   const clearFilters = () => {
-    const clearedFilters = { activityType: '', unitType: '', location: '' };
+    const clearedFilters = { unitType: '', location: '' };
     setLocalFilters(clearedFilters);
     onFilterChange(clearedFilters);
   };
 
-  const activityTypes = [
-    'Skydebane',
-    'Øvelsesterræn',
-    'Treningslejr',
-    'Specialoperation',
-    'Hovedkvarter'
-  ];
 
   const unitTypes = [
     'Hæren',
@@ -117,31 +109,6 @@ export function MilitarySidebar({
         </CardContent>
       </Card>
 
-      {/* Activity Type */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">AKTIVITETSTYPE</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {activityTypes.map((type) => (
-            <Button
-              key={type}
-              variant={localFilters.activityType === type ? "default" : "ghost"}
-              size="sm"
-              className={`w-full justify-start ${
-                localFilters.activityType === type 
-                  ? "bg-blue-600 text-white" 
-                  : "text-gray-300 hover:bg-gray-700"
-              }`}
-              onClick={() => handleFilterChange('activityType', 
-                localFilters.activityType === type ? '' : type
-              )}
-            >
-              {type}
-            </Button>
-          ))}
-        </CardContent>
-      </Card>
 
       {/* Regiment Type */}
       <Card className="bg-gray-800 border-gray-700">
