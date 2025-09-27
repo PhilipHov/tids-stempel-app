@@ -78,7 +78,6 @@ const mockAvailableResources = [
 
 interface FilterOptions {
   unitType: string;
-  location: string;
 }
 
 function App() {
@@ -86,7 +85,6 @@ function App() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [filters, setFilters] = useState<FilterOptions>({
     unitType: '',
-    location: '',
   });
   const [showResourceAllocation, setShowResourceAllocation] = useState(false);
   const [showDeploymentPlanning, setShowDeploymentPlanning] = useState(false);

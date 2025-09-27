@@ -27,7 +27,6 @@ interface MilitarySidebarProps {
 
 interface FilterOptions {
   unitType: string;
-  location: string;
 }
 
 export function MilitarySidebar({ 
@@ -51,7 +50,7 @@ export function MilitarySidebar({
   };
 
   const clearFilters = () => {
-    const clearedFilters = { unitType: '', location: '' };
+    const clearedFilters = { unitType: '' };
     setLocalFilters(clearedFilters);
     onFilterChange(clearedFilters);
   };
@@ -67,15 +66,6 @@ export function MilitarySidebar({
     'Ingeniørregimentet'
   ];
 
-  const locations = [
-    'Nordjylland',
-    'Midtjylland',
-    'Sydjylland',
-    'Fyn',
-    'Sjælland',
-    'København',
-    'Bornholm'
-  ];
 
   return (
     <div className="w-80 bg-gray-900 text-white p-4 space-y-4 overflow-y-auto">
@@ -135,29 +125,6 @@ export function MilitarySidebar({
       </Card>
 
 
-      {/* Location */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">STED</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Select 
-            value={localFilters.location} 
-            onValueChange={(value) => handleFilterChange('location', value)}
-          >
-            <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
-              <SelectValue placeholder="Vælg sted" />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-700 border-gray-600">
-              {locations.map((location) => (
-                <SelectItem key={location} value={location} className="text-white">
-                  {location}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
 
       {/* Action Buttons */}
       <div className="space-y-2">

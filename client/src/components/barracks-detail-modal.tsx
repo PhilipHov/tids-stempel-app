@@ -16,7 +16,14 @@ import {
   Clock,
   Target,
   UserCheck,
-  UserX
+  UserX,
+  Award,
+  BookOpen,
+  BarChart3,
+  UserPlus,
+  UserMinus,
+  Shield,
+  Star
 } from 'lucide-react';
 
 interface Personnel {
@@ -29,6 +36,26 @@ interface Personnel {
   nextTraining?: Date;
   nextDeployment?: Date;
   dropoutRisk: number;
+  currentQualifications: string[];
+  deploymentDate?: Date;
+  deploymentLocation: string;
+  careerProgression: {
+    currentLevel: string;
+    nextLevel: string;
+    monthsToPromotion: number;
+    requiredTraining: string[];
+  };
+  performanceMetrics: {
+    shootingAccuracy: number;
+    physicalFitness: number;
+    leadershipScore: number;
+    teamworkScore: number;
+  };
+  trainingHistory: Array<{
+    course: string;
+    completed: Date;
+    grade: string;
+  }>;
 }
 
 interface ResourceRequirements {
@@ -114,11 +141,13 @@ export function BarracksDetailModal({
         </DialogHeader>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Oversigt</TabsTrigger>
             <TabsTrigger value="personnel">Personel</TabsTrigger>
+            <TabsTrigger value="development">Udvikling</TabsTrigger>
             <TabsTrigger value="training">Træning</TabsTrigger>
             <TabsTrigger value="deployment">Udsendelse</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
@@ -249,6 +278,9 @@ export function BarracksDetailModal({
                           <div className="text-sm text-gray-600">
                             {person.rank} • {person.specialization} • {person.experience} år
                           </div>
+                          <div className="text-xs text-gray-500">
+                            {person.currentQualifications.join(', ')}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -271,6 +303,108 @@ export function BarracksDetailModal({
                             Planlæg Udsendelse
                           </Button>
                         )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="development" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Personel Udvikling
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {personnel.map((person) => (
+                    <div key={person.id} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="font-semibold flex items-center gap-2">
+                            <span className="text-lg">{getRankIcon(person.rank)}</span>
+                            {person.name}
+                          </h3>
+                          <p className="text-sm text-gray-600">{person.specialization}</p>
+                        </div>
+                        <Badge variant={person.dropoutRisk > 70 ? 'destructive' : person.dropoutRisk > 40 ? 'secondary' : 'default'}>
+                          {person.dropoutRisk}% frafaldsrisiko
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Career Progression */}
+                        <div>
+                          <h4 className="font-medium mb-2 flex items-center gap-1">
+                            <Award className="h-4 w-4" />
+                            Karriere Udvikling
+                          </h4>
+                          <div className="space-y-2 text-sm">
+                            <div>
+                              <span className="text-gray-600">Nuværende niveau:</span>
+                              <span className="ml-2 font-medium">{person.careerProgression.currentLevel}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Næste niveau:</span>
+                              <span className="ml-2 font-medium">{person.careerProgression.nextLevel}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Måneder til forfremmelse:</span>
+                              <span className="ml-2 font-medium">{person.careerProgression.monthsToPromotion}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Performance Metrics */}
+                        <div>
+                          <h4 className="font-medium mb-2 flex items-center gap-1">
+                            <BarChart3 className="h-4 w-4" />
+                            Performance
+                          </h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Skydebane:</span>
+                              <span className="font-medium">{person.performanceMetrics.shootingAccuracy}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Fysisk form:</span>
+                              <span className="font-medium">{person.performanceMetrics.physicalFitness}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Lederevne:</span>
+                              <span className="font-medium">{person.performanceMetrics.leadershipScore}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Teamarbejde:</span>
+                              <span className="font-medium">{person.performanceMetrics.teamworkScore}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Training History */}
+                      <div className="mt-4">
+                        <h4 className="font-medium mb-2 flex items-center gap-1">
+                          <BookOpen className="h-4 w-4" />
+                          Træningshistorik
+                        </h4>
+                        <div className="space-y-1">
+                          {person.trainingHistory.map((training, index) => (
+                            <div key={index} className="flex justify-between text-sm">
+                              <span>{training.course}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-600">{training.completed.toLocaleDateString('da-DK')}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {training.grade}
+                                </Badge>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ))}
