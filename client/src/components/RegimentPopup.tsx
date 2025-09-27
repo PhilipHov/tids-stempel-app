@@ -1,284 +1,485 @@
-// src/components/RegimentPopup.tsx
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Users, Wrench, GraduationCap, Info } from "lucide-react";
+// RegimentPopup.tsx
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Progress } from "./ui/progress";
+import { 
+  Users, 
+  AlertTriangle, 
+  CheckCircle, 
+  Calendar, 
+  MapPin,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Target,
+  UserCheck,
+  UserX,
+  Award,
+  BookOpen,
+  BarChart3,
+  UserPlus,
+  UserMinus,
+  Shield,
+  Star,
+  Building2,
+  GraduationCap,
+  Truck,
+  Info,
+  Wrench
+} from 'lucide-react';
 
-type RoleBreakdown = {
-  target: number;        // målsat antal (fx autoriseret norm)
-  current: number;       // nuværende antal
-};
-
-type Personnel = {
-  officers: Record<string, RoleBreakdown>; // fx { KC: {current: 4, target: 5}, PL: {...} }
-  ncos: RoleBreakdown;                      // befalingsmænd
-  enlisted: RoleBreakdown;                  // konstabler
-};
-
-type MaterielItem = {
-  name: string;          // fx "Ammo", "Våben", "Bygninger"
-  current: number;       // nuværende beholdning/tilstand
-  target: number;        // målsat beholdning/tilstand
-  unit?: string;         // fx "stk", "k patr.", "% up to date"
-};
-
-type TrainingNeed = {
-  unitType: "stående" | "uddannelses";
-  goalsTarget: number;   // samlede læringsmål/lektioner
-  goalsDone: number;     // gennemførte
-  missingLessons?: string[]; // navne på manglende lektioner
-};
-
-export type RegimentData = {
+export interface RegimentData {
   id: string;
   name: string;
-  personnel: Personnel;
-  materiel: {
-    ammo: MaterielItem;
-    weapons: MaterielItem;
-    buildings: MaterielItem; // "current" forstås som % up to date (0-100)
+  personnel: {
+    officers: {
+      KC: { current: number; target: number };
+      PL: { current: number; target: number };
+      KF: { current: number; target: number };
+    };
+    ncos: { current: number; target: number };
+    enlisted: { current: number; target: number };
   };
-  training: TrainingNeed[];
-  notes?: string;
-};
-
-function pct(current: number, target: number) {
-  if (target <= 0) return 100;
-  return Math.max(0, Math.min(100, Math.round((current / target) * 100)));
+  materiel: {
+    ammo: { name: string; current: number; target: number; unit: string };
+    weapons: { name: string; current: number; target: number; unit: string };
+    buildings: { name: string; current: number; target: number; unit: string };
+  };
+  training: Array<{
+    unitType: string;
+    goalsTarget: number;
+    goalsDone: number;
+    missingLessons: string[];
+  }>;
+  notes: string;
 }
 
-function deficit(current: number, target: number) {
-  return Math.max(0, target - current);
+interface RegimentPopupProps {
+  data: RegimentData;
 }
 
-// ——— Forslagsmaskiner ———
-function suggestPersonnel(p: Personnel, regShort?: string) {
-  const officerGaps = Object.entries(p.officers)
-    .filter(([, v]) => deficit(v.current, v.target) > 0)
-    .map(([role, v]) => `${role}: mangler ${deficit(v.current, v.target)}`);
+export default function RegimentPopup({ data }: RegimentPopupProps) {
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'Active': return <UserCheck className="h-4 w-4 text-green-600" />;
+      case 'Training': return <Clock className="h-4 w-4 text-blue-600" />;
+      case 'Deployed': return <Target className="h-4 w-4 text-orange-600" />;
+      case 'On Leave': return <UserX className="h-4 w-4 text-gray-600" />;
+      default: return <UserCheck className="h-4 w-4 text-gray-600" />;
+    }
+  };
 
-  const ncoGap = deficit(p.ncos.current, p.ncos.target);
-  const enlGap = deficit(p.enlisted.current, p.enlisted.target);
+  const getResourceStatus = (current: number, required: number) => {
+    if (current < required) return { status: 'shortage', color: 'text-red-600', bgColor: 'bg-red-100' };
+    if (current > required) return { status: 'excess', color: 'text-yellow-600', bgColor: 'bg-yellow-100' };
+    return { status: 'optimal', color: 'text-green-600', bgColor: 'bg-green-100' };
+  };
 
-  const suggestions: string[] = [];
-  if (officerGaps.length) {
-    suggestions.push(
-      `Prioritér omfordeling/konstituering på kort sigt (${officerGaps.join(", ")}).`
-    );
-  }
-  if (ncoGap > 0) {
-    suggestions.push(
-      `Fremskaf befalingsmænd via midlertidig udlån fra nærlig enhed (fx LG/HDV) og fremskynd SBU/MBU spor.`
-    );
-  }
-  if (enlGap > 0) {
-    suggestions.push(
-      `Ekstra rekrutteringshold + fastholdelsestiltag (bonus for kritiske stillinger, fleksible vagtplaner).`
-    );
-  }
-  suggestions.push(
-    `Udarbejd 12-ugers bemandingsplan med pulje af stand-ins og genindkaldelser; månedlig status mod norm.`
-  );
-  if (regShort?.toUpperCase() === "GHR") {
-    suggestions.push(`For GHR: koordiner med LG om midlertidig PL/KF før større øvelser.`);
-  }
-  return suggestions;
-}
+  const getTotalPersonnel = () => {
+    const officers = data.personnel.officers.KC.current + data.personnel.officers.PL.current + data.personnel.officers.KF.current;
+    return officers + data.personnel.ncos.current + data.personnel.enlisted.current;
+  };
 
-function suggestMateriel(m: RegimentData["materiel"], regShort?: string) {
-  const s: string[] = [];
-  if (deficit(m.ammo.current, m.ammo.target) > 0) {
-    s.push(`Ammo: planlæg top-up via depoter; bundne beholdninger balanceres før Q4-skydninger.`);
-  }
-  if (deficit(m.weapons.current, m.weapons.target) > 0) {
-    s.push(`Våben: udlån/ombytning fra naboenhed; prioriter vedligehold (MTBF>mål) før nyanskaffelse.`);
-  }
-  const bPct = pct(m.buildings.current, 100); // buildings.current er % up to date
-  if (bPct < 90) {
-    s.push(
-      `Bygninger: ${100 - bPct}% ikke up-to-date → aktiver FES for akut udbedring; brug midlertidige moduler til undervisning.`
-    );
-  }
-  if (regShort?.toUpperCase() === "GHR") {
-    s.push(`GHR mangler IKK'er → lån midlertidigt fra LG til certificerende øvelser.`);
-  }
-  return s;
-}
-
-function suggestTraining(t: TrainingNeed[]) {
-  const s: string[] = [];
-  const standing = t.filter(x => x.unitType === "stående");
-  const training = t.filter(x => x.unitType === "uddannelses");
-
-  const mk = (arr: TrainingNeed[]) =>
-    arr.map(x => {
-      const p = pct(x.goalsDone, x.goalsTarget);
-      const missing = x.missingLessons?.slice(0, 4).join(", ") || "—";
-      return `(${x.unitType}) ${p}% fuldført; mangler: ${missing}.`;
-    });
-
-  if (standing.length) s.push(...mk(standing));
-  if (training.length) s.push(...mk(training));
-
-  s.push(
-    `Plan: læg 6-ugers catch-up plan (2× ekstra lektion/uge), samlede test/validering i uge 7; book terræn og simulatorer nu.`
-  );
-  return s;
-}
-
-export default function RegimentPopup({ data }: { data: RegimentData }) {
-  const officerTotals = Object.values(data.personnel.officers).reduce(
-    (acc, v) => ({
-      current: acc.current + v.current,
-      target: acc.target + v.target,
-    }),
-    { current: 0, target: 0 }
-  );
-
-  const officersPct = pct(officerTotals.current, officerTotals.target);
-  const ncosPct = pct(data.personnel.ncos.current, data.personnel.ncos.target);
-  const enlistedPct = pct(data.personnel.enlisted.current, data.personnel.enlisted.target);
-
-  const ammoPct = pct(data.materiel.ammo.current, data.materiel.ammo.target);
-  const weaponsPct = pct(data.materiel.weapons.current, data.materiel.weapons.target);
-  const buildingsPct = pct(data.materiel.buildings.current, 100);
-
-  const trainingAgg = data.training.reduce(
-    (a, t) => ({ done: a.done + t.goalsDone, tgt: a.tgt + t.goalsTarget }),
-    { done: 0, tgt: 0 }
-  );
-  const trainingPct = pct(trainingAgg.done, trainingAgg.tgt);
+  const getTotalTarget = () => {
+    const officers = data.personnel.officers.KC.target + data.personnel.officers.PL.target + data.personnel.officers.KF.target;
+    return officers + data.personnel.ncos.target + data.personnel.enlisted.target;
+  };
 
   return (
-    <Card className="w-[320px]">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2">
-          <Info className="h-5 w-5" /> {data.name}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="personel" className="w-full">
-          <TabsList className="grid grid-cols-4">
-            <TabsTrigger value="personel"><Users className="h-4 w-4" /></TabsTrigger>
-            <TabsTrigger value="materiel"><Wrench className="h-4 w-4" /></TabsTrigger>
-            <TabsTrigger value="udd"><GraduationCap className="h-4 w-4" /></TabsTrigger>
-            <TabsTrigger value="andet">…</TabsTrigger>
-          </TabsList>
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">{data.name}</h1>
+        <div className="text-gray-600">
+          Regiment oversigt • {getTotalPersonnel()} personel
+        </div>
+      </div>
 
-          {/* PERSONEL */}
-          <TabsContent value="personel" className="space-y-3 pt-3">
-            <div>
-              <div className="flex justify-between text-sm">
-                <span>Officerer (KC/PL m.fl.)</span>
-                <span>{officersPct}%</span>
-              </div>
-              <Progress value={officersPct} />
-              <div className="text-xs text-muted-foreground mt-1">
-                {officerTotals.current} / {officerTotals.target}
-              </div>
-            </div>
+      <Tabs defaultValue="personnel" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="personnel">Personel</TabsTrigger>
+          <TabsTrigger value="materiel">Materiel</TabsTrigger>
+          <TabsTrigger value="uddannelse">Uddannelse</TabsTrigger>
+          <TabsTrigger value="deployment">Udsendelse</TabsTrigger>
+          <TabsTrigger value="andet">Andet</TabsTrigger>
+        </TabsList>
 
-            <div>
-              <div className="flex justify-between text-sm"><span>Befalingsmænd</span><span>{ncosPct}%</span></div>
-              <Progress value={ncosPct} />
-              <div className="text-xs text-muted-foreground mt-1">
-                {data.personnel.ncos.current} / {data.personnel.ncos.target}
-              </div>
-            </div>
+        <TabsContent value="personnel" className="space-y-4">
+          {/* Personnel Statistics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{data.personnel.officers.KC.current + data.personnel.officers.PL.current + data.personnel.officers.KF.current}</div>
+                <div className="text-sm text-gray-600">Officerer</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">{data.personnel.ncos.current}</div>
+                <div className="text-sm text-gray-600">Befalingsmænd</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-purple-600">{data.personnel.enlisted.current}</div>
+                <div className="text-sm text-gray-600">Menige</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-orange-600">{getTotalPersonnel()}</div>
+                <div className="text-sm text-gray-600">Totalt</div>
+              </CardContent>
+            </Card>
+          </div>
 
-            <div>
-              <div className="flex justify-between text-sm"><span>Konstabler</span><span>{enlistedPct}%</span></div>
-              <Progress value={enlistedPct} />
-              <div className="text-xs text-muted-foreground mt-1">
-                {data.personnel.enlisted.current} / {data.personnel.enlisted.target}
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <p className="text-xs font-semibold mb-1">Forslag (prognose):</p>
-              <ul className="list-disc ml-4 text-xs space-y-1">
-                {suggestPersonnel(data.personnel, data.name.split(" ")[0]).map((x,i)=>(<li key={i}>{x}</li>))}
-              </ul>
-            </div>
-          </TabsContent>
-
-          {/* MATERIEL */}
-          <TabsContent value="materiel" className="space-y-3 pt-3">
-            <div>
-              <div className="flex justify-between text-sm"><span>Ammo</span><span>{ammoPct}%</span></div>
-              <Progress value={ammoPct} />
-              <div className="text-xs text-muted-foreground mt-1">
-                {data.materiel.ammo.current} / {data.materiel.ammo.target} {data.materiel.ammo.unit ?? ""}
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm"><span>Våben</span><span>{weaponsPct}%</span></div>
-              <Progress value={weaponsPct} />
-              <div className="text-xs text-muted-foreground mt-1">
-                {data.materiel.weapons.current} / {data.materiel.weapons.target} {data.materiel.weapons.unit ?? ""}
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm"><span>Bygninger</span><span>{buildingsPct}%</span></div>
-              <Progress value={buildingsPct} />
-              <div className="text-xs text-muted-foreground mt-1">
-                {data.materiel.buildings.current}% up-to-date
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <p className="text-xs font-semibold mb-1">Forslag (prognose):</p>
-              <ul className="list-disc ml-4 text-xs space-y-1">
-                {suggestMateriel(data.materiel, data.name.split(" ")[0]).map((x,i)=>(<li key={i}>{x}</li>))}
-              </ul>
-            </div>
-          </TabsContent>
-
-          {/* UDDANNELSE */}
-          <TabsContent value="udd" className="space-y-3 pt-3">
-            <div>
-              <div className="flex justify-between text-sm"><span>Træning (samlet)</span><span>{trainingPct}%</span></div>
-              <Progress value={trainingPct} />
-              <div className="text-xs text-muted-foreground mt-1">
-                {trainingAgg.done} / {trainingAgg.tgt} mål
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <p className="text-xs font-semibold mb-1">Status per enhed:</p>
-              <div className="space-y-1">
-                {data.training.map((t, i) => {
-                  const p = pct(t.goalsDone, t.goalsTarget);
-                  return (
-                    <div key={i} className="text-xs">
-                      <div className="flex justify-between">
-                        <span className="capitalize">{t.unitType}</span>
-                        <span>{p}%</span>
+          {/* Personnel Breakdown */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Personel Oversigt
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Officers */}
+              <div>
+                <h4 className="font-medium mb-2">Officerer</h4>
+                <div className="space-y-2">
+                  {[
+                    { title: 'KC', current: data.personnel.officers.KC.current, target: data.personnel.officers.KC.target, icon: '🔺' },
+                    { title: 'PL', current: data.personnel.officers.PL.current, target: data.personnel.officers.PL.target, icon: '🔸' },
+                    { title: 'KF', current: data.personnel.officers.KF.current, target: data.personnel.officers.KF.target, icon: '🔹' }
+                  ].map(({ title, current, target, icon }) => {
+                    const status = getResourceStatus(current, target);
+                    const percentage = Math.round((current / target) * 100);
+                    
+                    return (
+                      <div key={title} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{icon}</span>
+                            <span className="font-medium">{title}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-bold ${status.color}`}>
+                              {current}/{target}
+                            </span>
+                            <Badge 
+                              variant={status.status === 'optimal' ? 'default' : 'destructive'}
+                              className={status.bgColor}
+                            >
+                              {status.status === 'optimal' ? 'Optimal' : 
+                               status.status === 'shortage' ? 'Mangler' : 'For mange'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Progress 
+                          value={Math.min(percentage, 100)} 
+                          className="h-2"
+                        />
                       </div>
-                      <Progress value={p} className="h-1" />
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
 
-            <div className="pt-2">
-              <p className="text-xs font-semibold mb-1">Forslag (prognose):</p>
-              <ul className="list-disc ml-4 text-xs space-y-1">
-                {suggestTraining(data.training).map((x,i)=>(<li key={i}>{x}</li>))}
-              </ul>
-            </div>
-          </TabsContent>
+              {/* NCOs */}
+              <div>
+                <h4 className="font-medium mb-2">Befalingsmænd</h4>
+                <div className="space-y-2">
+                  {(() => {
+                    const status = getResourceStatus(data.personnel.ncos.current, data.personnel.ncos.target);
+                    const percentage = Math.round((data.personnel.ncos.current / data.personnel.ncos.target) * 100);
+                    
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">🔸</span>
+                            <span className="font-medium">SSG</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-bold ${status.color}`}>
+                              {data.personnel.ncos.current}/{data.personnel.ncos.target}
+                            </span>
+                            <Badge 
+                              variant={status.status === 'optimal' ? 'default' : 'destructive'}
+                              className={status.bgColor}
+                            >
+                              {status.status === 'optimal' ? 'Optimal' : 
+                               status.status === 'shortage' ? 'Mangler' : 'For mange'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Progress 
+                          value={Math.min(percentage, 100)} 
+                          className="h-2"
+                        />
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
 
-          {/* ANDET */}
-          <TabsContent value="andet" className="space-y-3 pt-3">
-            <div className="text-xs space-y-2">
-              <p><strong>Noter:</strong></p>
-              <p>{data.notes || "Ingen noter registreret."}</p>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+              {/* Enlisted */}
+              <div>
+                <h4 className="font-medium mb-2">Menige</h4>
+                <div className="space-y-2">
+                  {(() => {
+                    const status = getResourceStatus(data.personnel.enlisted.current, data.personnel.enlisted.target);
+                    const percentage = Math.round((data.personnel.enlisted.current / data.personnel.enlisted.target) * 100);
+                    
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">🔹</span>
+                            <span className="font-medium">Menige</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-bold ${status.color}`}>
+                              {data.personnel.enlisted.current}/{data.personnel.enlisted.target}
+                            </span>
+                            <Badge 
+                              variant={status.status === 'optimal' ? 'default' : 'destructive'}
+                              className={status.bgColor}
+                            >
+                              {status.status === 'optimal' ? 'Optimal' : 
+                               status.status === 'shortage' ? 'Mangler' : 'For mange'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Progress 
+                          value={Math.min(percentage, 100)} 
+                          className="h-2"
+                        />
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="materiel" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Truck className="h-5 w-5" />
+                Materiel Oversigt
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Ammunition */}
+              <div>
+                <h4 className="font-medium mb-2">Ammunition</h4>
+                <div className="space-y-2">
+                  {(() => {
+                    const status = getResourceStatus(data.materiel.ammo.current, data.materiel.ammo.target);
+                    const percentage = Math.round((data.materiel.ammo.current / data.materiel.ammo.target) * 100);
+                    
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">🔸</span>
+                            <span className="font-medium">{data.materiel.ammo.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-bold ${status.color}`}>
+                              {data.materiel.ammo.current.toLocaleString()}/{data.materiel.ammo.target.toLocaleString()} {data.materiel.ammo.unit}
+                            </span>
+                            <Badge 
+                              variant={status.status === 'optimal' ? 'default' : 'destructive'}
+                              className={status.bgColor}
+                            >
+                              {status.status === 'optimal' ? 'Optimal' : 
+                               status.status === 'shortage' ? 'Mangler' : 'For mange'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Progress 
+                          value={Math.min(percentage, 100)} 
+                          className="h-2"
+                        />
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Weapons */}
+              <div>
+                <h4 className="font-medium mb-2">Våben</h4>
+                <div className="space-y-2">
+                  {(() => {
+                    const status = getResourceStatus(data.materiel.weapons.current, data.materiel.weapons.target);
+                    const percentage = Math.round((data.materiel.weapons.current / data.materiel.weapons.target) * 100);
+                    
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">🔹</span>
+                            <span className="font-medium">{data.materiel.weapons.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-bold ${status.color}`}>
+                              {data.materiel.weapons.current}/{data.materiel.weapons.target} {data.materiel.weapons.unit}
+                            </span>
+                            <Badge 
+                              variant={status.status === 'optimal' ? 'default' : 'destructive'}
+                              className={status.bgColor}
+                            >
+                              {status.status === 'optimal' ? 'Optimal' : 
+                               status.status === 'shortage' ? 'Mangler' : 'For mange'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Progress 
+                          value={Math.min(percentage, 100)} 
+                          className="h-2"
+                        />
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Buildings */}
+              <div>
+                <h4 className="font-medium mb-2">Bygninger og Infrastruktur</h4>
+                <div className="space-y-2">
+                  {(() => {
+                    const status = getResourceStatus(data.materiel.buildings.current, data.materiel.buildings.target);
+                    const percentage = Math.round((data.materiel.buildings.current / data.materiel.buildings.target) * 100);
+                    
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">🏢</span>
+                            <span className="font-medium">{data.materiel.buildings.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-bold ${status.color}`}>
+                              {data.materiel.buildings.current}/{data.materiel.buildings.target} {data.materiel.buildings.unit}
+                            </span>
+                            <Badge 
+                              variant={status.status === 'optimal' ? 'default' : 'destructive'}
+                              className={status.bgColor}
+                            >
+                              {status.status === 'optimal' ? 'Optimal' : 
+                               status.status === 'shortage' ? 'Mangler' : 'For mange'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Progress 
+                          value={Math.min(percentage, 100)} 
+                          className="h-2"
+                        />
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="uddannelse" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <GraduationCap className="h-5 w-5" />
+                Uddannelsesplaner
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {data.training.map((training, index) => (
+                  <div key={index} className="border rounded-lg p-4">
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      {training.unitType === 'stående' ? 'Stående Styrker' : 'Uddannelsesenheder'}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-sm text-gray-600 mb-2">Nuværende Status</div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>Fuldført:</span>
+                            <span className="font-medium">{training.goalsDone}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Mål:</span>
+                            <span className="font-medium">{training.goalsTarget}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-600 mb-2">Prognose</div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>Manglende:</span>
+                            <span className="font-medium text-red-600">{training.goalsTarget - training.goalsDone}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Mål opfyldt:</span>
+                        <span className="font-medium">{Math.round((training.goalsDone / training.goalsTarget) * 100)}%</span>
+                      </div>
+                      <Progress 
+                        value={(training.goalsDone / training.goalsTarget) * 100} 
+                        className="h-2 mb-2" 
+                      />
+                      <div className="text-xs text-gray-500 mt-1">
+                        <strong>Mangler:</strong> {training.missingLessons.join(' • ')}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="deployment" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Udsendelse Planlægning
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">Detaljer om kommende og igangværende udsendelser for regimentet.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="andet" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="h-5 w-5" />
+                Noter og Andet
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-gray-700">{data.notes}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

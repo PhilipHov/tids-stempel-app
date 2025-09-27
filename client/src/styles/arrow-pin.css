@@ -1,0 +1,6 @@
+/* src/styles/arrow-pin.css */
+.arrow-pin svg {
+  fill: #2f80ed;         /* blå pil */
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));
+}
+.arrow-pin:hover svg { transform: translateY(-1px); }
