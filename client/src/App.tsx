@@ -200,10 +200,12 @@ function App() {
             filters={filters}
           />
           <div className="flex-1">
-            <MilitaryResourceMap
-              barracks={mockBarracks}
-              onBarracksSelect={handleBarracksSelect}
-            />
+            {!selectedBarracks && !selectedRegiment && !showResourceAllocation && !showDeploymentPlanning && (
+              <MilitaryResourceMap
+                barracks={mockBarracks}
+                onBarracksSelect={handleBarracksSelect}
+              />
+            )}
           </div>
           <BarracksDetailModal
             barracks={selectedBarracks}
