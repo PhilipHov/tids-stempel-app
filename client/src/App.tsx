@@ -84,6 +84,7 @@ interface FilterOptions {
 
 function App() {
   const [selectedBarracks, setSelectedBarracks] = useState<typeof mockBarracks[0] | null>(null);
+  const [selectedRegiment, setSelectedRegiment] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [filters, setFilters] = useState<FilterOptions>({
     unitType: '',
@@ -93,7 +94,9 @@ function App() {
   const [selectedPersonnel, setSelectedPersonnel] = useState<typeof mockPersonnel[0] | null>(null);
 
   const handleBarracksSelect = (barracks: typeof mockBarracks[0]) => {
-    setSelectedBarracks(barracks);
+    // When a barracks is selected, open the regiment detail modal for its regiment
+    setSelectedRegiment(barracks.regiment);
+    setSelectedBarracks(barracks); // Keep selectedBarracks for potential future use
   };
 
   const handleSearch = (query: string) => {
@@ -129,6 +132,62 @@ function App() {
     };
   };
 
+  // Group barracks and personnel by regiment for RegimentDetailModal
+  const getRegimentData = (regimentName: string) => {
+    const barracksInRegiment = allBarracks.filter(b => b.regiment === regimentName);
+    const personnelInRegiment = allPersonnel.filter(p => p.regiment === regimentName);
+
+    const totalPersonnel = personnelInRegiment.length;
+    const totalBarracks = barracksInRegiment.length;
+    const totalCapacity = barracksInRegiment.reduce((sum, b) => sum + (b.capacity || 0), 0);
+
+    const totalSSG = personnelInRegiment.filter(p => p.rank === 'SSG').length;
+    const totalBefalingsmaend = personnelInRegiment.filter(p => p.rank === 'Befalingsmand').length;
+    const totalOfficerer = personnelInRegiment.filter(p => p.rank === 'Officer').length;
+
+    const requiredSSG = barracksInRegiment.reduce((sum, b) => sum + (b.resources?.requiredSSG || 0), 0);
+    const requiredBefalingsmaend = barracksInRegiment.reduce((sum, b) => sum + (b.resources?.requiredBefalingsmaend || 0), 0);
+    const requiredOfficerer = barracksInRegiment.reduce((sum, b) => sum + (b.resources?.requiredOfficerer || 0), 0);
+
+    const averageExperience = personnelInRegiment.length > 0 
+      ? personnelInRegiment.reduce((sum, p) => sum + p.experience, 0) / personnelInRegiment.length
+      : 0;
+
+    return {
+      name: regimentName,
+      totalBarracks,
+      totalPersonnel,
+      totalCapacity,
+      barracks: barracksInRegiment,
+      personnel: personnelInRegiment,
+      statistics: {
+        totalSSG,
+        totalBefalingsmaend,
+        totalOfficerer,
+        requiredSSG,
+        requiredBefalingsmaend,
+        requiredOfficerer,
+        averageExperience,
+      },
+      // Add mock data for Materiel, Uddannelse, Andet
+      materiel: [
+        { name: 'Kampvogn Leopard 2', quantity: 15, status: 'Operational', barracks: 'Holstebro Kaserne' },
+        { name: 'Panserinfanterikøretøj CV90', quantity: 20, status: 'Maintenance', barracks: 'Slagelse Kaserne' },
+        { name: 'Artilleri M109', quantity: 8, status: 'Operational', barracks: 'Varde Kaserne' },
+      ],
+      uddannelse: [
+        { name: 'Føringskursus I', startDate: new Date('2025-10-01'), endDate: new Date('2025-10-30'), participants: 10, location: 'Karup' },
+        { name: 'Skydebane Øvelse', startDate: new Date('2025-11-10'), endDate: new Date('2025-11-12'), participants: 50, location: 'Oksbøl' },
+      ],
+      andet: [
+        { title: 'Næste inspektion', date: new Date('2026-01-15'), details: 'Årlig inspektion af materiel' },
+        { title: 'Budget status', details: '85% brugt af årligt budget' },
+      ]
+    };
+  };
+
+  const currentRegimentData = selectedRegiment ? getRegimentData(selectedRegiment) : null;
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -155,6 +214,20 @@ function App() {
             onResourceAllocation={handleResourceAllocation}
             onDeploymentPlanning={handleDeploymentPlanning}
           />
+          
+          {currentRegimentData && (
+            <RegimentDetailModal
+              regimentData={currentRegimentData}
+              isOpen={!!selectedRegiment}
+              onClose={() => setSelectedRegiment(null)}
+              onBarracksSelect={(barracksId) => {
+                const barracks = allBarracks.find(b => b.id === barracksId);
+                if (barracks) {
+                  setSelectedBarracks(barracks);
+                }
+              }}
+            />
+          )}
           
           <ResourceAllocation
             isOpen={showResourceAllocation}
