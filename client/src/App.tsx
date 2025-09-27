@@ -7,74 +7,14 @@ import { MilitarySidebar } from './components/military-sidebar';
 import { BarracksDetailModal } from './components/barracks-detail-modal';
 import { ResourceAllocation } from './components/resource-allocation';
 import { DeploymentPlanning } from './components/deployment-planning';
+import { allBarracks } from './data/barracks-data';
 import { queryClient } from "./lib/queryClient";
 
-// Mock data for demonstration
-const mockBarracks = [
-  {
-    id: '1',
-    name: 'Aalborg Kaserne',
-    location: 'Aalborg',
-    latitude: 57.0488,
-    longitude: 9.9217,
-    regiment: 'Jydske Dragonregiment',
-    region: 'Nordjylland',
-    resources: {
-      id: '1',
-      barracksId: '1',
-      requiredSSG: 15,
-      requiredBefalingsmaend: 8,
-      requiredOfficerer: 5,
-      currentSSG: 12,
-      currentBefalingsmaend: 6,
-      currentOfficerer: 7,
-      lastUpdated: new Date(),
-    },
-    personnelCount: 25,
-  },
-  {
-    id: '2',
-    name: 'Aarhus Kaserne',
-    location: 'Aarhus',
-    latitude: 56.1572,
-    longitude: 10.2107,
-    regiment: 'Gardehusarregimentet',
-    region: 'Midtjylland',
-    resources: {
-      id: '2',
-      barracksId: '2',
-      requiredSSG: 20,
-      requiredBefalingsmaend: 12,
-      requiredOfficerer: 8,
-      currentSSG: 18,
-      currentBefalingsmaend: 14,
-      currentOfficerer: 6,
-      lastUpdated: new Date(),
-    },
-    personnelCount: 38,
-  },
-  {
-    id: '3',
-    name: 'København Kaserne',
-    location: 'København',
-    latitude: 55.6761,
-    longitude: 12.5683,
-    regiment: 'Livgarden',
-    region: 'København',
-    resources: {
-      id: '3',
-      barracksId: '3',
-      requiredSSG: 25,
-      requiredBefalingsmaend: 15,
-      requiredOfficerer: 10,
-      currentSSG: 25,
-      currentBefalingsmaend: 15,
-      currentOfficerer: 10,
-      lastUpdated: new Date(),
-    },
-    personnelCount: 50,
-  },
-];
+// Use real barracks data
+const mockBarracks = allBarracks.map(barracks => ({
+  ...barracks,
+  personnelCount: barracks.currentPersonnel,
+}));
 
 const mockPersonnel = [
   {

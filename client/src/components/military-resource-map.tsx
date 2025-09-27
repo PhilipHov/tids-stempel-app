@@ -82,6 +82,8 @@ export function MilitaryResourceMap({ barracks, onBarracksSelect }: MilitaryReso
         zoom={7}
         style={{ height: '100%', width: '100%' }}
         className="z-0"
+        maxBounds={[[53.0, 7.0], [58.0, 16.0]]} // Restrict to Denmark area
+        maxBoundsViscosity={1.0}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

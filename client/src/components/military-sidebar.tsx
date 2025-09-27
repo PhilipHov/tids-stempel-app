@@ -66,13 +66,13 @@ export function MilitarySidebar({
   ];
 
   const unitTypes = [
-    'Infanteri',
-    'Artilleri',
-    'Ingeniør',
-    'Signaler',
-    'Logistik',
-    'Sanitet',
-    'Luftvåben'
+    'Hæren',
+    'Marinen',
+    'Flyvevåbnet',
+    'Livgarden',
+    'Gardehusarregimentet',
+    'Jydske Dragonregiment',
+    'Ingeniørregimentet'
   ];
 
   const locations = [
@@ -143,10 +143,10 @@ export function MilitarySidebar({
         </CardContent>
       </Card>
 
-      {/* Unit Type */}
+      {/* Regiment Type */}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm">ENHEDSTYPE</CardTitle>
+          <CardTitle className="text-sm">REGIMENT</CardTitle>
         </CardHeader>
         <CardContent>
           <Select 
@@ -154,7 +154,7 @@ export function MilitarySidebar({
             onValueChange={(value) => handleFilterChange('unitType', value)}
           >
             <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
-              <SelectValue placeholder="Vælg enhedstype" />
+              <SelectValue placeholder="Vælg regiment" />
             </SelectTrigger>
             <SelectContent className="bg-gray-700 border-gray-600">
               {unitTypes.map((type) => (
@@ -167,42 +167,6 @@ export function MilitarySidebar({
         </CardContent>
       </Card>
 
-      {/* Calendar */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <CalendarIcon className="h-4 w-4" />
-            Kalender
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={(date) => date && onDateSelect(date)}
-            className="bg-gray-700 rounded-md"
-            classNames={{
-              day: "text-white hover:bg-blue-600",
-              day_selected: "bg-blue-600 text-white",
-              day_today: "bg-gray-600 text-white",
-              head_cell: "text-gray-300",
-              row: "border-gray-600",
-            }}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Directive Input */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">DIREKTIV</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-700">
-            + Indsæt direktiv
-          </Button>
-        </CardContent>
-      </Card>
 
       {/* Location */}
       <Card className="bg-gray-800 border-gray-700">
@@ -255,21 +219,27 @@ export function MilitarySidebar({
         <CardContent className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span>Totale Kaserner:</span>
-            <span className="text-blue-400">24</span>
+            <span className="text-blue-400">21</span>
           </div>
           <div className="flex justify-between">
-            <span>Mangler Personel:</span>
-            <span className="text-red-400 flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3" />
-              8
-            </span>
+            <span>Totalt Personel:</span>
+            <span className="text-blue-400">12.350</span>
           </div>
           <div className="flex justify-between">
-            <span>Optimalt Bemandet:</span>
-            <span className="text-green-400 flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" />
-              16
-            </span>
+            <span>Hæren:</span>
+            <span className="text-green-400">14 kaserner</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Marinen:</span>
+            <span className="text-blue-400">3 flådestationer</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Flyvevåbnet:</span>
+            <span className="text-purple-400">3 flyvestationer</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Livgarden:</span>
+            <span className="text-yellow-400">1 kaserne</span>
           </div>
         </CardContent>
       </Card>
