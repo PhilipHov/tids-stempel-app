@@ -23,7 +23,8 @@ import {
   UserPlus,
   UserMinus,
   Shield,
-  Star
+  Star,
+  ArrowLeftRight
 } from 'lucide-react';
 
 interface Personnel {
