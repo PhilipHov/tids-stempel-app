@@ -8,18 +8,21 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { MapPin, Users, AlertTriangle, CheckCircle } from 'lucide-react';
 
-// Custom icon for military barracks
-const barracksIcon = new Icon({
+// Custom teardrop pin icon for military barracks
+const createBarracksIcon = (color: string) => new Icon({
   iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6">
-      <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
-      <path d="M2 17L12 22L22 17"/>
-      <path d="M2 12L12 17L22 12"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="30" viewBox="0 0 20 30" fill="${color}">
+      <path d="M10 0C4.477 0 0 4.477 0 10c0 5.523 10 20 10 20s10-14.477 10-20c0-5.523-4.477-10-10-10zm0 15c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5z" fill="${color}"/>
+      <circle cx="10" cy="10" r="6" fill="white"/>
     </svg>
   `),
-  iconSize: [24, 24],
-  iconAnchor: [12, 12],
+  iconSize: [20, 30],
+  iconAnchor: [10, 30],
+  popupAnchor: [0, -30],
 });
+
+// Default barracks icon
+const barracksIcon = createBarracksIcon('#3b82f6');
 
 interface BarracksWithResources extends typeof barracks.$inferSelect {
   resources?: typeof resourceRequirements.$inferSelect;
@@ -37,6 +40,19 @@ export function MilitaryResourceMap({ barracks, onBarracksSelect }: MilitaryReso
   const handleMarkerClick = (barracks: BarracksWithResources) => {
     setSelectedBarracks(barracks);
     onBarracksSelect(barracks);
+  };
+
+  const getRegimentColor = (regiment: string) => {
+    switch (regiment) {
+      case 'Hæren': return '#22c55e'; // Green
+      case 'Marinen': return '#3b82f6'; // Blue
+      case 'Flyvevåbnet': return '#8b5cf6'; // Purple
+      case 'Livgarden': return '#f59e0b'; // Orange
+      case 'Gardehusarregimentet': return '#ef4444'; // Red
+      case 'Jydske Dragonregiment': return '#06b6d4'; // Cyan
+      case 'Ingeniørregimentet': return '#84cc16'; // Lime
+      default: return '#3b82f6'; // Default blue
+    }
   };
 
   const getResourceStatus = (resources?: typeof resourceRequirements.$inferSelect) => {
@@ -94,12 +110,14 @@ export function MilitaryResourceMap({ barracks, onBarracksSelect }: MilitaryReso
           const status = getResourceStatus(barrack.resources);
           const statusColor = getStatusColor(status);
           const statusIcon = getStatusIcon(status);
+          const regimentColor = getRegimentColor(barrack.regiment);
+          const icon = createBarracksIcon(regimentColor);
           
           return (
             <Marker
               key={barrack.id}
               position={[barrack.latitude, barrack.longitude]}
-              icon={barracksIcon}
+              icon={icon}
               eventHandlers={{
                 click: () => handleMarkerClick(barrack),
               }}
