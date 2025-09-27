@@ -53,8 +53,11 @@ interface MilitaryResourceMapProps {
 
 export function MilitaryResourceMap({ barracks, onBarracksSelect }: MilitaryResourceMapProps) {
   const [selectedBarracks, setSelectedBarracks] = useState<BarracksWithResources | null>(null);
+  
+  console.log('MilitaryResourceMap rendered with barracks:', barracks.length);
 
   const handleMarkerClick = (barracks: BarracksWithResources) => {
+    console.log('Marker clicked:', barracks.name);
     setSelectedBarracks(barracks);
     onBarracksSelect(barracks);
   };
