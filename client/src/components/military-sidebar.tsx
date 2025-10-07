@@ -82,12 +82,12 @@ export function MilitarySidebar({
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <Search className="h-4 w-4" />
-            Søg Kaserner
+            Søg Regimenter
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <Input
-            placeholder="Søg efter kaserne eller regiment..."
+            placeholder="Søg efter regiment..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-gray-700 border-gray-600 text-white"
@@ -152,8 +152,8 @@ export function MilitarySidebar({
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span>Totale Kaserner:</span>
-            <span className="text-blue-400">21</span>
+                <span>Totale Regimenter:</span>
+                <span className="text-blue-400">21</span>
           </div>
           <div className="flex justify-between">
             <span>Totalt Personel:</span>
@@ -161,7 +161,7 @@ export function MilitarySidebar({
           </div>
           <div className="flex justify-between">
             <span>Hæren:</span>
-            <span className="text-green-400">14 kaserner</span>
+                <span className="text-green-400">14 regimenter</span>
           </div>
           <div className="flex justify-between">
             <span>Marinen:</span>
@@ -173,7 +173,7 @@ export function MilitarySidebar({
           </div>
           <div className="flex justify-between">
             <span>Livgarden:</span>
-            <span className="text-yellow-400">1 kaserne</span>
+                <span className="text-yellow-400">1 regiment</span>
           </div>
         </CardContent>
       </Card>

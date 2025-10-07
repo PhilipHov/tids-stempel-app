@@ -1,4 +1,4 @@
-// Komplet database over alle danske kaserner
+// Komplet database over alle danske militære enheder
 export const allBarracks = [
   // Region Hovedstaden
   {
@@ -9,7 +9,7 @@ export const allBarracks = [
     longitude: 12.5935,
     regiment: 'Hæren',
     region: 'Region Hovedstaden',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 800,
     currentPersonnel: 720,
     resources: {
@@ -72,13 +72,13 @@ export const allBarracks = [
   },
   {
     id: 'svanemollen',
-    name: 'Svanemøllens Kaserne',
+    name: 'Svanemøllens Enhed',
     location: 'København',
     latitude: 55.7094,
     longitude: 12.5706,
     regiment: 'Hæren',
     region: 'Region Hovedstaden',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 600,
     currentPersonnel: 580,
     resources: {
@@ -95,13 +95,13 @@ export const allBarracks = [
   },
   {
     id: 'garder',
-    name: 'Garder Kasernen',
+    name: 'Garder Enheden',
     location: 'Høvelte',
     latitude: 55.8333,
     longitude: 12.3167,
     regiment: 'Hæren',
     region: 'Region Hovedstaden',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 400,
     currentPersonnel: 350,
     resources: {
@@ -118,13 +118,13 @@ export const allBarracks = [
   },
   {
     id: 'livgarden',
-    name: 'Livgardens Kaserne',
+    name: 'Livgardens Enhed',
     location: 'København',
     latitude: 55.6761,
     longitude: 12.5683,
     regiment: 'Livgarden',
     region: 'Region Hovedstaden',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 800,
     currentPersonnel: 750,
     resources: {
@@ -141,13 +141,13 @@ export const allBarracks = [
   },
   {
     id: 'almegard',
-    name: 'Almegårds Kaserne',
+    name: 'Almegårds Enhed',
     location: 'Bornholm',
     latitude: 55.0972,
     longitude: 14.7161,
     regiment: 'Hæren',
     region: 'Region Hovedstaden',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 300,
     currentPersonnel: 280,
     resources: {
@@ -189,13 +189,13 @@ export const allBarracks = [
   },
   {
     id: 'slagelse',
-    name: 'Gardehusarkasernen',
+    name: 'Gardehusarenheden',
     location: 'Slagelse',
     latitude: 55.4167,
     longitude: 11.3500,
     regiment: 'Gardehusarregimentet',
     region: 'Region Sjælland',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 600,
     currentPersonnel: 580,
     resources: {
@@ -212,13 +212,13 @@ export const allBarracks = [
   },
   {
     id: 'vordingborg',
-    name: 'Vordingborg Kaserne',
+    name: 'Vordingborg Enhed',
     location: 'Vordingborg',
     latitude: 55.0167,
     longitude: 11.9167,
     regiment: 'Hæren',
     region: 'Region Sjælland',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 400,
     currentPersonnel: 380,
     resources: {
@@ -283,13 +283,13 @@ export const allBarracks = [
   },
   {
     id: 'skive',
-    name: 'Ingeniørkasernen',
+    name: 'Ingeniørenheden',
     location: 'Skive',
     latitude: 56.5667,
     longitude: 9.0333,
     regiment: 'Ingeniørregimentet',
     region: 'Region Midtjylland',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 500,
     currentPersonnel: 480,
     resources: {
@@ -306,13 +306,13 @@ export const allBarracks = [
   },
   {
     id: 'holstebro',
-    name: 'Dragonkasernen',
+    name: 'Dragonenheden',
     location: 'Holstebro',
     latitude: 56.3667,
     longitude: 8.6167,
     regiment: 'Jydske Dragonregiment',
     region: 'Region Midtjylland',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 600,
     currentPersonnel: 580,
     resources: {
@@ -354,13 +354,13 @@ export const allBarracks = [
   // Region Syddanmark
   {
     id: 'fredericia',
-    name: 'Ryes Kaserne',
+    name: 'Ryes Enhed',
     location: 'Fredericia',
     latitude: 55.5667,
     longitude: 9.7500,
     regiment: 'Hæren',
     region: 'Region Syddanmark',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 600,
     currentPersonnel: 580,
     resources: {
@@ -400,13 +400,13 @@ export const allBarracks = [
   },
   {
     id: 'varde',
-    name: 'Varde Kaserne',
+    name: 'Varde Enhed',
     location: 'Varde',
     latitude: 55.6167,
     longitude: 8.4833,
     regiment: 'Hæren',
     region: 'Region Syddanmark',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 400,
     currentPersonnel: 380,
     resources: {
@@ -423,13 +423,13 @@ export const allBarracks = [
   },
   {
     id: 'oksbol',
-    name: 'Oksbøl Kaserne',
+    name: 'Oksbøl Enhed',
     location: 'Oksbøl',
     latitude: 55.6333,
     longitude: 8.2833,
     regiment: 'Hæren',
     region: 'Region Syddanmark',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 500,
     currentPersonnel: 480,
     resources: {
@@ -446,13 +446,13 @@ export const allBarracks = [
   },
   {
     id: 'haderslev',
-    name: 'Haderslev Kaserne',
+    name: 'Haderslev Enhed',
     location: 'Haderslev',
     latitude: 55.2500,
     longitude: 9.5000,
     regiment: 'Hæren',
     region: 'Region Syddanmark',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 400,
     currentPersonnel: 380,
     resources: {
@@ -517,13 +517,13 @@ export const allBarracks = [
   },
   {
     id: 'aalborg-kaserne',
-    name: 'Aalborg Kaserner',
+    name: 'Aalborg Enheder',
     location: 'Aalborg',
     latitude: 57.0488,
     longitude: 9.9217,
     regiment: 'Jydske Dragonregiment',
     region: 'Region Nordjylland',
-    type: 'Kaserne',
+    type: 'Enhed',
     capacity: 700,
     currentPersonnel: 680,
     resources: {

@@ -119,7 +119,7 @@ export function RegimentDetailModal({ regimentData, isOpen, onClose }: RegimentD
             {regimentData.name}
           </DialogTitle>
           <div className="text-gray-600">
-            Regiment oversigt • {regimentData.totalBarracks} kaserner • {regimentData.totalPersonnel} personel
+              Regiment oversigt • {regimentData.totalBarracks} enheder • {regimentData.totalPersonnel} personel
           </div>
         </DialogHeader>
 
@@ -136,7 +136,7 @@ export function RegimentDetailModal({ regimentData, isOpen, onClose }: RegimentD
           <TabsContent value="barracks" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Kaserner i Regimentet</CardTitle>
+                <CardTitle>Enheder i Regimentet</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -188,7 +188,7 @@ export function RegimentDetailModal({ regimentData, isOpen, onClose }: RegimentD
               <Card>
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-blue-600">{regimentData.totalBarracks}</div>
-                  <div className="text-sm text-gray-600">Kaserner</div>
+                  <div className="text-sm text-gray-600">Enheder</div>
                 </CardContent>
               </Card>
               <Card>

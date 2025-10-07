@@ -1,4 +1,4 @@
-// Komplet personel data for alle kaserner
+// Komplet personel data for alle militære enheder
 export const allPersonnel = [
   // Kastellet - Hæren
   {
@@ -223,7 +223,7 @@ export const trainingCourses = [
     endDate: new Date('2025-12-15'),
     participants: ['kastellet-002'],
     capacity: 15,
-    location: 'Aarhus Kaserne',
+    location: 'Aarhus Enhed',
     status: 'Scheduled',
     prerequisites: ['Officer Rang', 'Føreruddannelse'],
     instructor: 'Oberst Nielsen',
